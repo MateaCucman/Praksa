@@ -1,0 +1,16 @@
+{
+    "name": "matea/praksa",
+    "autoload": {
+        "psr-4": {
+            "Matea\\Praksa\\": "Praksa/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Matea Cucman",
+            "email": "matea.cucman@factory.dev"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
