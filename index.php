@@ -4,23 +4,49 @@ require_once 'rutes.php';
 require_once 'req.php';
 require_once 'res.php';
 
-
-$request = new Request(['user_id' => 123], ['name' => 'John']);
+$request = new Request();
 
 $router = new Router();
 
-$router->addRoute('/user', 'GET', function (RequestInterface $request) {
-    $userId = $request->get('user_id');
-    $response = new Response("ID: $userId <br>");
+$router->addRoute('/Praksa/', 'GET', function (RequestInterface $request) 
+{
+    $name = $request->get('name');
+    $response = new Response("$name");
     $response->send();
 });
 
-$router->addRoute('/post', 'POST', function (RequestInterface $request) {
-    $name = $request->post('name');
-    $response = new Response("Name: $name");
-    $response->send();
+$router->addRoute('/Praksa/', 'POST', function (RequestInterface $request) 
+{
+    if($request->is_set('name')){
+        $name = $request->post('name');
+        $response = new Response("$name");
+        $response->send();
+    }
 });
 
-$router->resolve('/user', 'GET', $request);
+$router->resolve($request);
 
-$router->resolve('/post', 'POST', $request);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<form method="get" action="">
+    <label for="name">get:</label>
+    <input type="text" name="name" id="name">
+    <input type="submit" Value="submit">
+</form>
+
+<form method="post">
+    <label for="name">post:</label>
+    <input type="text" name="name" id="name">
+    <input type="submit" Value="submit">
+</form>
+</body>
+</html>
+

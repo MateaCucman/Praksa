@@ -4,6 +4,8 @@ interface RequestInterface
 {
     public function get($key);
     public function post($key);
+    public function is_set($key);
+    
 }
 
 class Request implements RequestInterface
@@ -11,10 +13,16 @@ class Request implements RequestInterface
     private $getParams;
     private $postParams;
 
-    public function __construct($getParams, $postParams)
+    public function __construct()
     {
-        $this->getParams = $getParams;
-        $this->postParams = $postParams;
+        $this->getParams = $_GET;
+        $this->postParams = $_POST;
+        
+    }
+
+    public function is_set($key)
+    {
+        return isset($_POST[$key]);
     }
 
     public function get($key)

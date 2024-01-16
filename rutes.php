@@ -1,8 +1,10 @@
 <?php
-class Router{
+class Router
+{
     private $routes = [];
-    
-    public function addRoute($url, $method, $cb){
+
+    public function addRoute($url, $method, $cb)
+    {
         $this->routes[] = [
             'url' => $url,
             'method' => strtoupper($method),
@@ -10,10 +12,12 @@ class Router{
         ];
      }
 
-    public function resolve($url, $method, RequestInterface $request)
+    public function resolve(RequestInterface $request)
     {
-        foreach ($this->routes as $route) {
-            if ($route['url'] === $url && $route['method'] === strtoupper($method)) {
+        foreach ($this->routes as $route) 
+        {
+            if (str_contains($_SERVER['REQUEST_URI'], $route['url']) && $route['method'] === strtoupper($_SERVER['REQUEST_METHOD'])) {
+
                 $cb = $route['cb'];
                 $cb($request);
                 return;
