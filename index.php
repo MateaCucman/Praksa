@@ -8,14 +8,14 @@ $request = new Request();
 
 $router = new Router();
 
-$router->addRoute('/Praksa/', 'GET', function (RequestInterface $request) 
+$router->addRoute('/', 'GET', function (RequestInterface $request) 
 {
     $name = $request->get('name');
     $response = new Response("$name");
     $response->send();
 });
 
-$router->addRoute('/Praksa/', 'POST', function (RequestInterface $request) 
+$router->addRoute('/', 'POST', function (RequestInterface $request) 
 {
     if($request->is_set('name')){
         $name = $request->post('name');
