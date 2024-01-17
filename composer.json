@@ -2,7 +2,7 @@
     "name": "matea/praksa",
     "autoload": {
         "psr-4": {
-            "Matea\\Praksa\\": "Praksa/"
+            "Matea\\Praksa\\": "src/"
         }
     },
     "authors": [

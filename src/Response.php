@@ -1,9 +1,7 @@
 <?php
 
-interface ResponseInterface
-{
-    public function send(): string;
-}
+namespace Matea\Praksa;
+use Matea\Praksa\Interfaces\ResponseInterface;
 
 class Response implements ResponseInterface
 {
