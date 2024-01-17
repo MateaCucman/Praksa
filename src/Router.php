@@ -18,8 +18,8 @@ class Router
     {
         foreach ($this->routes as $route) 
         {
-            if (str_contains($request->getUri(), '/Praksa' . $route['url'])) {
-
+            $url = str_contains($request->getUri(), '?') ? explode('?', $request->getUri())[0]  : $request->getUri();
+            if ($url == '/Praksa' . $route['url']) {
                 $cb = $route['cb'];
                 return $cb($request);;
             }
@@ -27,3 +27,5 @@ class Router
         echo "404 Not Found";
     }
 }
+
+//str_contains($request->getUri(), '/Praksa' . $route['url'])

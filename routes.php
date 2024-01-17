@@ -12,7 +12,7 @@ $router->addRoute('/', function (Request $request)
 
 $router->addRoute('/todos', function (Request $request) 
 {
-    $todos = $request->getParams('todos');
-    $response = new Response("$todos");
+    $todo = $request->getParams('todo');
+    $response = new Response("$todo");
     return $response;
 });
