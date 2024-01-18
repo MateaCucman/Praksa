@@ -7,13 +7,25 @@ class Request implements RequestInterface
 {
     private $url;
     private $method;
-    private $Params;
+    private $params;
+    private $body;
 
     public function __construct()
     {
         $this->url = $_SERVER['REQUEST_URI'];
         $this->method = $_SERVER['REQUEST_METHOD'];
-        $this->Params = array_merge($_GET, $_POST);
+        $this->setParams();
+        $this->setBody();
+    }
+
+    protected function setParams() :void
+    {
+        $this->params = $_GET;
+    }
+
+    protected function setBody() :void
+    {
+        $this->body = $_POST;
     }
 
     public function is_set($key)

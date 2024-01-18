@@ -3,16 +3,14 @@ namespace Matea\Praksa;
 
 use Matea\Praksa\Response;
 
-$router->addRoute('/', function (Request $request) 
+Router::addRoute('/', 'get', function (Request $request) 
 {
-    $home = $request->getParams('home');
-    $response = new Response("$home");
-    return $response;
+    return new Response("home");
 });
 
-$router->addRoute('/todos', function (Request $request) 
+Router::addRoute('/products', 'get', function (Request $request) 
 {
-    $todo = $request->getParams('todo');
-    $response = new Response("$todo");
-    return $response;
+    return new Response("products");
 });
+
+

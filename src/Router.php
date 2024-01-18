@@ -4,28 +4,28 @@ use Matea\Praksa\Interfaces\RequestInterface;
 
 class Router
 {
-    private $routes = [];
+    static private $routes = [];
 
-    public function addRoute($url, $cb)
+    static public function addRoute($url, $method, $cb)
     {
-        $this->routes[] = [
+        $url = 
+        self::$routes[] = [
             'url' => $url,
+            'method' => strToUpper($method),
             'cb' => $cb
         ];
      }
 
-    public function resolve(Request $request)
+    static public function resolve(Request $request)
     {
-        foreach ($this->routes as $route) 
+        foreach (self::$routes as $route) 
         {
-            $url = str_contains($request->getUri(), '?') ? explode('?', $request->getUri())[0]  : $request->getUri();
-            if ($url == '/Praksa' . $route['url']) {
-                $cb = $route['cb'];
-                return $cb($request);;
+            if (($route['method'] === $request->getMethod()) && ('/Praksa' . $route['url'] === $request->getUri())) {
+                return call_user_func($route['cb'], $request);
+                
             }
         }
         echo "404 Not Found";
+        return null;
     }
 }
-
-//str_contains($request->getUri(), '/Praksa' . $route['url'])
