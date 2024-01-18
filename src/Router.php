@@ -8,7 +8,6 @@ class Router
 
     static public function addRoute($url, $method, $cb)
     {
-        $url = 
         self::$routes[] = [
             'url' => $url,
             'method' => strToUpper($method),
