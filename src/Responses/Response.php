@@ -1,6 +1,6 @@
 <?php
 
-namespace Matea\Praksa;
+namespace Matea\Praksa\Responses;
 use Matea\Praksa\Interfaces\ResponseInterface;
 
 class Response implements ResponseInterface

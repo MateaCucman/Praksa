@@ -13,27 +13,56 @@ class Router
             'method' => strToUpper($method),
             'cb' => $cb
         ];
-     }
+    }
 
     static public function resolve(Request $request)
     {
+        $uri = $request->getUri();
         foreach (self::$routes as $route) 
         {
-            $uri = $request->getUri();
-            $uriParts = explode('/', $uri);
-            $uriLast = $uriParts[sizeof($uriParts)-1];
-            $urlParts = explode('/', $route['url']);
-            if(strpos(':', $urlParts[sizeof($urlParts)-1])==0){
-                $urlParts[sizeof($urlParts)-1]  = str_replace($urlParts[sizeof($urlParts)-1], $uriLast, $urlParts[sizeof($urlParts)-1]);
-            }
-            $urlNew = implode('/', $urlParts);
-            $route['url'] = $urlNew;
-            if (($route['method'] === $request->getMethod()) && ('/Praksa' . $route['url'] === $uri)) {
-                return call_user_func($route['cb'], $request, $uriLast);
-                
+            $url = $route['url'];
+            $pomArr = self::resolveParams($uri, $url);
+            //echo $url . '<br>';
+            if(self::routeMatch($url, $uri, $pomArr))
+            {
+                $request->setAttr($pomArr);
+                return call_user_func($route['cb'], $request);
             }
         }
         echo "404 Not Found";
         return null;
+    }
+
+    static protected function resolveParams($uri, $url)
+    {
+        $uriParts = explode('/', $uri);
+        $urlParts = explode('/', $url);
+        $params = [];
+        if(count($uriParts) === count($urlParts))
+        {
+            for($i = 0; $i<count($uriParts); $i++)
+            {
+                preg_match('/:(\w+)/', $urlParts[$i], $matches);
+                array_shift($matches);
+                if($matches)
+                {
+                    $pomVar = $matches[0];
+                    $params[$pomVar] = $uriParts[$i];
+                }
+            }
+        }
+        return $params;  
+    }
+
+    static protected function routeMatch($url, $uri, $pomArr)
+    {
+        //print_r($pomArr);
+        foreach($pomArr as $key =>$value)
+        {
+            $url = str_replace(':' . $key, $value, $url);
+            //echo $value;
+        }
+        //echo($url. '<br>');
+        return $url === $uri;
     }
 }

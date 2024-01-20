@@ -9,6 +9,7 @@ class Request implements RequestInterface
     private $method;
     private $params;
     private $body;
+    private $attr;
 
     public function __construct()
     {
@@ -16,6 +17,7 @@ class Request implements RequestInterface
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->setParams();
         $this->setBody();
+        $attr = [];
     }
 
     protected function setParams() :void
@@ -26,6 +28,16 @@ class Request implements RequestInterface
     protected function setBody() :void
     {
         $this->body = $_POST;
+    }
+
+    public function setAttr($a)
+    {
+        $this->attr = $a;
+    }
+
+    public function getAttr($a)
+    {
+        return $this->attr[$a];
     }
 
     public function is_set($key)
