@@ -5,11 +5,11 @@ use Matea\Praksa\Interfaces\RequestInterface;
 
 class Request implements RequestInterface
 {
-    private $url;
-    private $method;
-    private $params;
-    private $body;
-    private $attr;
+    private string $url;
+    private string $method;
+    private array $params;
+    private array $body;
+    private array $attrs;
 
     public function __construct()
     {
@@ -17,45 +17,45 @@ class Request implements RequestInterface
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->setParams();
         $this->setBody();
-        $attr = [];
+        $attrs = [];
     }
 
-    protected function setParams() :void
+    protected function setParams(): void
     {
         $this->params = $_GET;
     }
 
-    protected function setBody() :void
+    protected function setBody(): void
     {
         $this->body = $_POST;
     }
 
-    public function setAttr($a)
+    public function setAttr(array $attrs): void
     {
-        $this->attr = $a;
+        $this->attrs = $attrs;
     }
 
-    public function getAttr($a)
+    public function getAttr(string $attr): string
     {
-        return $this->attr[$a];
+        return $this->attrs[$attr];
     }
 
-    public function is_set($key)
+    public function is_set(string $key): bool
     {
         return isset($_POST[$key]);
     }
 
-    public function getParams($key)
+    public function getParams(string $key): ?string
     {
         return isset($this->Params[$key]) ? $this->Params[$key] : null;
     }
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
-    public function getUri()
+    public function getUri(): string
     {
         return $this->url;
     }

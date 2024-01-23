@@ -1,9 +1,9 @@
 <?php
 
 namespace Matea\Praksa\Responses;
-use Matea\Praksa\Interfaces\ResponseInterface;
+use Matea\Praksa\Interfaces\HtmlResponseInterface;
 
-class Response implements ResponseInterface
+class HtmlResponse implements HtmlResponseInterface
 {
     private string $content;
 

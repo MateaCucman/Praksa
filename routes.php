@@ -5,39 +5,35 @@ use Matea\Praksa\Responses\Response;
 use Matea\Praksa\Responses\JsonResponse;
 use Matea\Praksa\Controllers\IndexController;
 
-Router::addRoute('/', 'get', function (Request $request) 
+Router::get('/', function (Request $request): Response
 {
-    return new Response("home");
+    return new Response('home');
 });
 
-Router::addRoute('/products', 'get', function (Request $request) 
-{
-    return new JsonResponse(
-        [
-            'data' => "products"
-        ]);
-});
-
-Router::addRoute('/products/:id', 'get', function (Request $request) 
-{
-    return new Response("product_" . $request->getAttr('id'));
-});
-
-Router::addRoute('/products/:id/:type', 'get', function (Request $request) 
+Router::get('/products', function (Request $request): JsonResponse
 {
     return new JsonResponse(
         [
-            "product_id" => $request->getAttr('id'), 
-            "type" => $request->getAttr('type')
+            'data' => 'products'
         ]);
 });
 
-Router::addRoute('/reg', 'get', function (Request $request)
-{ 
-    return IndexController::indexAction();
+Router::get('/products/:id', function (Request $request): Response
+{
+    return new Response('product_' . $request->getAttr('id'));
 });
 
-Router::addRoute('/json', 'get', function (Request $request)
-{ 
-    return IndexController::indexJsonAction();
+Router::get('/products/:id/:type', function (Request $request): JsonResponse
+{
+    return new JsonResponse(
+        [
+            'product_id' => $request->getAttr('id'), 
+            'type' => $request->getAttr('type')
+        ]);
 });
+
+Router::get('/reg', [IndexController::class, 'indexAction']);
+
+Router::get('/json', [IndexController::class, 'indexJsonAction']);
+
+Router::get('/twig/products/:id', [IndexController::class, 'indexHtmlAction']);

@@ -5,13 +5,13 @@ use Matea\Praksa\Interfaces\JsonResponseInterface;
 use JsonSerializable;
 class JsonResponse implements JsonResponseInterface, JsonSerializable
 {
-    private $content;
+    private array $content;
 
     public function __construct($content)
     {
         $this->content = $content;
     }
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->content;
     }
