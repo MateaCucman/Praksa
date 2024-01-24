@@ -31,7 +31,7 @@ class Router
             $url = $route['url'];
             $params = self::resolveParams($uri, $url);
             
-            if(self::routeMatch($url, $uri, $params) & $route['method'] == $request->getMethod()){
+            if(self::routeMatch($url, $uri, $params) && $route['method'] == $request->getMethod()){
                 $request->setAttr($params);
                 return call_user_func($route['cb'], $request);
             }

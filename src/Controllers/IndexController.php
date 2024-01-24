@@ -9,37 +9,37 @@ use Twig;
 
 class IndexController extends Connection
 {
-    static public function conn(): void
-    {
-        $pdo = Connection::getInstance();
-        $conn = $pdo->connectToDb();
-        
-        $unbufferedResult = $conn->query("SELECT col_name FROM some_table");
-        foreach ($unbufferedResult as $row) {
-            echo $row['col_name'] . PHP_EOL;
-        }
-    }
-
     static public function indexAction(): Response
     {
-        static::conn();
         return new Response('Regular response');
     }
 
-    static public function indexJsonAction(): JsonResponse
+    static public function indexJsonAction($request): JsonResponse
     {
-        static::conn();
-        return new JsonResponse(['data' => 'Json response']);
+        $query = 'SELECT id, name 
+                    FROM products 
+                    WHERE id > :id 
+                        AND type = :type 
+                    LIMIT 20';
+                    
+        $placeholders = ['id' => $request->getAttr('id'), 'type' => $request->getAttr('type')];
+
+        $pdo = Connection::getInstance()->fetchAssocAll($query, $placeholders);
+
+        return new JsonResponse($pdo);
     }
 
     static public function indexHtmlAction($request): HtmlResponse
     {
-        static::conn();
+        $query = 'SELECT id, name FROM products WHERE id = ?';
+
+        $pdo = Connection::getInstance()->fetchAssoc($query, [$request->getAttr('id')]);
+        
         $loader = new \Twig\Loader\ArrayLoader([
-            'index' => '<h1>Product {{ id }}!</h1>',
+            'index' => '<h2>Product: {{ name }}!</h2>',
         ]);
         $twig = new \Twig\Environment($loader);
         
-        return new HtmlResponse($twig->render('index', ['id' => $request->getAttr('id')]));
+        return new HtmlResponse($twig->render('index', ['name' => $pdo['name']]));
     }
 }
