@@ -49,7 +49,7 @@ class Connection
         return $result;
     }
 
-    public function insert (string $tableName, array $values): bool
+    public function insert (string $tableName, array $values): string
     {
         $conn = $this->connection;
         $conn->beginTransaction();
@@ -79,7 +79,9 @@ class Connection
         $statement = $conn->prepare("INSERT INTO $tableName ($columnNames) VALUES ($placeholders);");
 
         $statement->execute($valuesValues);
-        return $conn->commit();
+        $idValue = $conn->lastInsertId();
+        $conn->commit();
+        return $idValue;
     }
 
     public function update (string $tableName, array $values, array $conditions): bool

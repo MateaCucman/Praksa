@@ -5,9 +5,10 @@ use Matea\Praksa\Responses\Response;
 use Matea\Praksa\Responses\JsonResponse;
 use Matea\Praksa\Responses\HtmlResponse;
 use Matea\Praksa\Connection;
+use Matea\Praksa\Products;
 use Twig;
 
-class IndexController extends Connection
+class IndexController
 {
     static public function indexAction($request): Response
     {
@@ -24,16 +25,24 @@ class IndexController extends Connection
 
     static public function indexJsonAction($request): JsonResponse
     {
-        $query = 'SELECT id, name 
-                    FROM products 
-                    WHERE id > :id 
-                        AND type = :type 
-                    LIMIT 20';
-                    
-        $placeholders = ['id' => $request->getAttr('id'), 'type' => $request->getAttr('type')];
+        if($request->getMethod() === 'GET'){
+            $query = 'SELECT id, name 
+            FROM products 
+            WHERE id > :id 
+                AND type = :type 
+            LIMIT 20';
 
-        $pdo = Connection::getInstance()->fetchAssocAll($query, $placeholders);
+            $placeholders = ['id' => $request->getAttr('id'), 'type' => $request->getAttr('type')];
 
+            $pdo = Connection::getInstance()->fetchAssocAll($query, $placeholders);
+        } else {
+            $product = new Products();
+            $product->attributes = $request->getAttrs();
+
+            $product->save();
+            $pdo = $product->toArray();
+        }
+        
         return new JsonResponse($pdo);
     }
 
