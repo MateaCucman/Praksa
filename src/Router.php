@@ -15,7 +15,7 @@ class Router
         ];
     }
 
-    static public function post(string $url, object $cb): void
+    static public function post(string $url, object|array $cb): void
     {
         self::$routes[] = [
             'url' => $url,

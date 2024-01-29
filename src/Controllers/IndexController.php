@@ -9,8 +9,16 @@ use Twig;
 
 class IndexController extends Connection
 {
-    static public function indexAction(): Response
+    static public function indexAction($request): Response
     {
+        if($request->getMethod() === 'POST'){
+            Connection::getInstance()->insert('products', $request->getAttrs());
+        }
+        
+        // $values = ['name' =>'product1', 'type' => 'b'];
+        // $conditions = ['id' => 97];
+        // Connection::getInstance()->update('products', $values, $conditions);
+
         return new Response('Regular response');
     }
 

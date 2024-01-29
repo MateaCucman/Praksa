@@ -49,55 +49,61 @@ class Connection
         return $result;
     }
 
-    // Isprobala sam insert na bazi i radi, ali svaki redak mi duplo doda,
-    // ne znam kako da riješim taj problem
-
-    public function insert (string $tableName, array $values)
+    public function insert (string $tableName, array $values): bool
     {
         $conn = $this->connection;
         $conn->beginTransaction();
 
-        $sth = $conn->prepare("INSERT INTO $tableName (name, type) VALUES (:name, :type);");
         if(isset($values[0])) {
-            foreach($values as $value){
-                $sth->execute($value);
+            $valuesKeys = array_keys($values[0]);
+            $placeholder = implode(',', array_fill(0, count($valuesKeys), '?'));
+            $placeholders = [];
+            $valuesValues = [];
+            
+            foreach($values as $values_){
+                foreach($values_ as $value){
+                    array_push($valuesValues, $value);
+                }
+                array_push($placeholders, $placeholder);
             }
+            $placeholders = implode('), (', $placeholders);
+            
         } else {
-            $sth->execute($values);
+            $valuesKeys = array_keys($values);
+            $valuesValues = array_values($values);
+
+            $placeholders = implode(',', array_fill(0, count($values), '?'));
         }
+        $columnNames = implode(',', $valuesKeys);
+
+        $statement = $conn->prepare("INSERT INTO $tableName ($columnNames) VALUES ($placeholders);");
+
+        $statement->execute($valuesValues);
         return $conn->commit();
     }
 
-    // U update metodi sam pokušala sve vrijednosti koje se update-aju staviti u jedan string, a uvjete u drugi 
-    // i ukloniti im s kraja ', ', ali ne funkcionira :(
-    // Ne znam kako napraviti da se može update-ati više vrijednosti odjednom uz više uvjeta
-    // u slučaju kada ne znamo koliko će vrijednosti i uvjeta biti.
-    // Trebam li uo uopće tako raditi ili trebam uzeti fiksne stupce?
-
-    public function update (string $tableName, array $values, array $conditions)
+    public function update (string $tableName, array $values, array $conditions): bool
     {
         $conn = $this->connection;
         $conn->beginTransaction();
 
         $placeholders = [];
-        $vals = '';
-        $conds = '';
+        $setValues = [];
+        $whereValues = [];
 
-        $sth = $conn->prepare("UPDATE $tableName SET ? WHERE ?;");
-        
         foreach($values as $key => $value){
-            $vals .= "$key = $value, ";
+            array_push($setValues, "$key = '$value'");
         }
+        $setValues = implode(', ', $setValues);
+
         foreach($conditions as $key => $value){
-            $conds .= "$key = $value, ";
+            array_push($whereValues, "$tableName.$key = '$value'");
         }
+        $whereValues = implode(', ', $whereValues);
 
-        $vals = substr($vals, 0, -2);
-        $conds = substr($conds, 0, -2);
-        
-        array_push($placeholders, $vals, $conds);
+        $statement = $conn->prepare("UPDATE $tableName SET $setValues WHERE $whereValues;");
 
-        $sth->execute($placeholders);
+        $statement->execute();
         return $conn->commit();
     }
 }

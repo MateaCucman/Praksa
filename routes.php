@@ -37,3 +37,5 @@ Router::get('/reg', [IndexController::class, 'indexAction']);
 Router::get('/json/:type/:id', [IndexController::class, 'indexJsonAction']);
 
 Router::get('/twig/products/:id', [IndexController::class, 'indexHtmlAction']);
+
+Router::post('/insert/products/:name/:type', [IndexController::class, 'indexAction']);

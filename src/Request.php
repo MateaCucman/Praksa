@@ -40,6 +40,11 @@ class Request implements RequestInterface
         return $this->attrs[$attr];
     }
 
+    public function getAttrs(): array
+    {
+        return $this->attrs;
+    }
+
     public function is_set(string $key): bool
     {
         return isset($_POST[$key]);
