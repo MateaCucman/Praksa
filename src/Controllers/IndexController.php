@@ -37,13 +37,25 @@ class IndexController
 
     static public function indexJsonActionPost($request): JsonResponse
     {
-        $product = new Products();
-
+        $product = new Product();
         $product->attributes = $request->getAttrs();
-        $product->save();
-
-        return new JsonResponse($product->toArray());
+        $queryParams = $request->getParams();
+        
+        if($queryParams){
+            $arrayOfParams = [];
+            for($i = 0; $i < count($queryParams[key($queryParams)]); $i++){
+                $Params = [];
+                foreach($queryParams as $key => $param){
+                    $Params[$key] = $param[$i];
+                }
+                array_push($arrayOfParams, $Params);
+            }
+            $product->attributes = $arrayOfParams;
         }
+
+        $product->save();
+        return new JsonResponse($product->toarray());
+    }
 
     static public function indexHtmlAction($request): HtmlResponse
     {
@@ -51,7 +63,7 @@ class IndexController
 
         $pdo = Connection::getInstance()->fetchAssoc($query, [$request->getAttr('id')]);
         
-        $loader = new \Twig\Loader\ArrayLoader([
+        $loader = new \Twig\Loader\arrayLoader([
             'index' => '<h2>Product: {{ name }}!</h2>',
         ]);
         $twig = new \Twig\Environment($loader);

@@ -45,14 +45,24 @@ class Request implements RequestInterface
         return $this->attrs;
     }
 
+    public function getBody(): array
+    {
+        return $this->body;
+    }
+
     public function is_set(string $key): bool
     {
         return isset($_POST[$key]);
     }
 
-    public function getParams(string $key): ?string
+    public function getParam(string $key): ?string
     {
-        return isset($this->Params[$key]) ? $this->Params[$key] : null;
+        return isset($this->Param[$key]) ? $this->Param[$key] : null;
+    }
+
+    public function getParams(): array
+    {
+        return $this->params;
     }
 
     public function getMethod(): string

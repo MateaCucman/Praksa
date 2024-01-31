@@ -38,4 +38,6 @@ Router::get('/twig/products/:id', [IndexController::class, 'indexHtmlAction']);
 
 Router::post('/update/:name/:type/:id', [IndexController::class, 'indexAction']);
 
-Router::post('/insert/products/:name/:type', [IndexController::class, 'indexJsonActionPost']);
+Router::post('/insert/:name/:type', [IndexController::class, 'indexJsonActionPost']);
+
+Router::post('/insertMany/products', [IndexController::class, 'indexJsonActionPost']);
