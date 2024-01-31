@@ -5,46 +5,45 @@ use Matea\Praksa\Responses\Response;
 use Matea\Praksa\Responses\JsonResponse;
 use Matea\Praksa\Responses\HtmlResponse;
 use Matea\Praksa\Connection;
-use Matea\Praksa\Products;
+use Matea\Praksa\Product;
 use Twig;
 
 class IndexController
 {
     static public function indexAction($request): Response
     {
-        if($request->getMethod() === 'POST'){
-            Connection::getInstance()->insert('products', $request->getAttrs());
-        }
-        
-        // $values = ['name' =>'product1', 'type' => 'b'];
-        // $conditions = ['id' => 97];
-        // Connection::getInstance()->update('products', $values, $conditions);
+        $a = $request->getAttrs();
+        $product = Product::find(end($a));
+        $product->attributes = $request->getAttrs();
+        $product->update();
 
         return new Response('Regular response');
     }
 
     static public function indexJsonAction($request): JsonResponse
     {
-        if($request->getMethod() === 'GET'){
-            $query = 'SELECT id, name 
-            FROM products 
-            WHERE id > :id 
-                AND type = :type 
-            LIMIT 20';
+        $query = 'SELECT id, name 
+        FROM products 
+        WHERE id > :id 
+            AND type = :type 
+        LIMIT 20';
 
-            $placeholders = ['id' => $request->getAttr('id'), 'type' => $request->getAttr('type')];
+        $placeholders = ['id' => $request->getAttr('id'), 'type' => $request->getAttr('type')];
 
-            $pdo = Connection::getInstance()->fetchAssocAll($query, $placeholders);
-        } else {
-            $product = new Products();
-            $product->attributes = $request->getAttrs();
-
-            $product->save();
-            $pdo = $product->toArray();
-        }
+        $pdo = Connection::getInstance()->fetchAssocAll($query, $placeholders);
         
         return new JsonResponse($pdo);
     }
+
+    static public function indexJsonActionPost($request): JsonResponse
+    {
+        $product = new Products();
+
+        $product->attributes = $request->getAttrs();
+        $product->save();
+
+        return new JsonResponse($product->toArray());
+        }
 
     static public function indexHtmlAction($request): HtmlResponse
     {

@@ -3,7 +3,7 @@ namespace Matea\Praksa;
 
 use Matea\Praksa\Model;
 
-class Products extends Model
+class Product extends Model
 {
     protected int|string $primaryKey = 'id';
     protected string $tableName = 'products';

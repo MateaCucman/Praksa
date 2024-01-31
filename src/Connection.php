@@ -37,16 +37,16 @@ class Connection
     {
         $conn = $this->connection->prepare($query);
         $conn->execute($params);
-        $result = $conn->fetch(\PDO::FETCH_ASSOC);
-        return $result;
+        
+        return $conn->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function fetchAssocAll (string $query, array $params): array
     {
         $conn = $this->connection->prepare($query);
         $conn->execute($params);
-        $result = $conn->fetchall(\PDO::FETCH_ASSOC);
-        return $result;
+        
+        return $conn->fetchall(\PDO::FETCH_ASSOC);
     }
 
     public function insert (string $tableName, array $values): string
