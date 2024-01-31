@@ -17,22 +17,10 @@ abstract class Model
 
     public function update()
     {
-        //self::find($primaryKey);
         $value = end($this->attributes);
         $key = key($this->attributes);
         array_pop($this->attributes);
         Connection::getInstance()->update($this->tableName, $this->attributes, [$key => $value]);
-
-        // $setClause = implode(', ', array_map(function ($column) {
-        //     return "$column = ?";
-        // }, array_keys($this->attributes)));
-
-        // $query = "UPDATE {$this->table} SET {$setClause} WHERE {$this->primaryKey} = ?";
-        // $values = array_merge(array_values($this->attributes), [$this->{$this->primaryKey}]);
-
-        // $this->executeQuery($query, $values);
-
-        // $this->fill($this->find($this->{$this->primaryKey})->toArray());
     }
 
     static public function find($primaryKey): ?Model
