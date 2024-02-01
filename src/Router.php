@@ -1,6 +1,5 @@
 <?php
 namespace Matea\Praksa;
-use Matea\Praksa\Interfaces\RequestInterface;
 
 class Router
 {

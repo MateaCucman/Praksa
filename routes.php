@@ -32,12 +32,12 @@ Router::get('/products/:id/:type', function (Request $request): JsonResponse
         ]);
 });
 
-Router::get('/select/:type/:id', [IndexController::class, 'indexJsonAction']);
+Router::get('/selectMany/:type/:id', [IndexController::class, 'indexJsonAction']);
 
-Router::get('/twig/products/:id', [IndexController::class, 'indexHtmlAction']);
+Router::get('/selectOne/:id', [IndexController::class, 'indexHtmlAction']);
 
 Router::post('/update/:name/:type/:id', [IndexController::class, 'indexAction']);
 
-Router::post('/insert/:name/:type', [IndexController::class, 'indexJsonActionPost']);
+Router::post('/insertOne/:name/:type', [IndexController::class, 'indexJsonActionPost']);
 
 Router::post('/insertMany/products', [IndexController::class, 'indexJsonActionPost']);

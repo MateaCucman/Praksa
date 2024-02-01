@@ -17,10 +17,10 @@ abstract class Model
 
     public function update()
     {
-        $value = end($this->attributes);
-        $key = key($this->attributes);
+        $idValue = end($this->attributes);
+        $idKey = key($this->attributes);
         array_pop($this->attributes);
-        Connection::getInstance()->update($this->tableName, $this->attributes, [$key => $value]);
+        Connection::getInstance()->update($this->tableName, $this->attributes, [$idKey => $idValue]);
     }
 
     static public function find($primaryKey): ?Model
@@ -30,6 +30,16 @@ abstract class Model
         $instance->attributes = Connection::getInstance()->fetchAssoc($query, [$primaryKey]);
 
         return $instance;
+    }
+
+    static public function select($params): array
+    {
+        $query = 'SELECT id, name FROM products
+                    WHERE type = :type AND id > :id
+                    LIMIT 20';
+        
+        $pdo = Connection::getInstance()->fetchAssocAll($query, $params);
+        return $pdo;
     }
 
     public function toArray(): array

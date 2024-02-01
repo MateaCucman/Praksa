@@ -35,6 +35,11 @@ class Request implements RequestInterface
         $this->attrs = $attrs;
     }
 
+    public function is_set(string $key): bool
+    {
+        return isset($_POST[$key]);
+    }
+
     public function getAttr(string $attr): string
     {
         return $this->attrs[$attr];
@@ -48,11 +53,6 @@ class Request implements RequestInterface
     public function getBody(): array
     {
         return $this->body;
-    }
-
-    public function is_set(string $key): bool
-    {
-        return isset($_POST[$key]);
     }
 
     public function getParam(string $key): ?string

@@ -4,7 +4,6 @@ namespace Matea\Praksa\Controllers;
 use Matea\Praksa\Responses\Response;
 use Matea\Praksa\Responses\JsonResponse;
 use Matea\Praksa\Responses\HtmlResponse;
-use Matea\Praksa\Connection;
 use Matea\Praksa\Product;
 use Twig;
 
@@ -12,8 +11,7 @@ class IndexController
 {
     static public function indexAction($request): Response
     {
-        $a = $request->getAttrs();
-        $product = Product::find(end($a));
+        $product = Product::find($request->getAttr('id'));
         $product->attributes = $request->getAttrs();
         $product->update();
 
@@ -22,17 +20,12 @@ class IndexController
 
     static public function indexJsonAction($request): JsonResponse
     {
-        $query = 'SELECT id, name 
-        FROM products 
-        WHERE id > :id 
-            AND type = :type 
-        LIMIT 20';
-
-        $placeholders = ['id' => $request->getAttr('id'), 'type' => $request->getAttr('type')];
-
-        $pdo = Connection::getInstance()->fetchAssocAll($query, $placeholders);
+        $params = array_filter($request->getAttrs(), function($key){
+            return $key == 'id' || $key == 'type';
+        }, ARRAY_FILTER_USE_KEY);
         
-        return new JsonResponse($pdo);
+        $product = Product::select($params);
+        return new JsonResponse($product);
     }
 
     static public function indexJsonActionPost($request): JsonResponse
@@ -48,7 +41,7 @@ class IndexController
                 foreach($queryParams as $key => $param){
                     $Params[$key] = $param[$i];
                 }
-                array_push($arrayOfParams, $Params);
+                $arrayOfParams[] = $Params;
             }
             $product->attributes = $arrayOfParams;
         }
@@ -59,15 +52,12 @@ class IndexController
 
     static public function indexHtmlAction($request): HtmlResponse
     {
-        $query = 'SELECT id, name FROM products WHERE id = ?';
-
-        $pdo = Connection::getInstance()->fetchAssoc($query, [$request->getAttr('id')]);
-        
+        $product = Product::find($request->getAttr('id'));
         $loader = new \Twig\Loader\arrayLoader([
             'index' => '<h2>Product: {{ name }}!</h2>',
         ]);
         $twig = new \Twig\Environment($loader);
         
-        return new HtmlResponse($twig->render('index', ['name' => $pdo['name']]));
+        return new HtmlResponse($twig->render('index', ['name' => $product->attributes['name']]));
     }
 }
