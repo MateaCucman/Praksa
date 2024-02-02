@@ -49,13 +49,11 @@ class Connection
         return $conn->fetchall(\PDO::FETCH_ASSOC);
     }
 
-    public function insert (string $tableName, array $values): string
+    public function insert (string $tableName, array $values): void
     {
         $conn = $this->connection;
-        $conn->beginTransaction();
-
-        if(isset($values[0])) {
-            $valuesKeys = array_keys($values[0]);
+        if(is_array($values[key($values)])) {
+            $valuesKeys = array_keys($values);
             $placeholder = implode(',', array_fill(0, count($valuesKeys), '?'));
             $placeholders = [];
             $valuesValues = [];
@@ -64,9 +62,9 @@ class Connection
                 foreach($values_ as $value){
                     array_push($valuesValues, $value);
                 }
-                array_push($placeholders, $placeholder);
             }
-            $placeholders = implode('), (', $placeholders);
+            print_r($valuesValues);
+            $placeholders = implode('), (', array_fill(0, count($values['name']), $placeholder));
             
         } else {
             $valuesKeys = array_keys($values);
@@ -79,15 +77,11 @@ class Connection
         $statement = $conn->prepare("INSERT INTO $tableName ($columnNames) VALUES ($placeholders);");
 
         $statement->execute($valuesValues);
-        $idValue = $conn->lastInsertId();
-        $conn->commit();
-        return $idValue;
     }
 
-    public function update (string $tableName, array $values, array $conditions): bool
+    public function update (string $tableName, array $values, array $conditions): void
     {
         $conn = $this->connection;
-        $conn->beginTransaction();
 
         $placeholders = [];
         $setValues = [];
@@ -106,6 +100,5 @@ class Connection
         $statement = $conn->prepare("UPDATE $tableName SET $setValues WHERE $whereValues;");
 
         $statement->execute();
-        return $conn->commit();
     }
 }

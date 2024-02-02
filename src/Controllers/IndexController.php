@@ -12,10 +12,16 @@ class IndexController
     static public function indexAction($request): Response
     {
         $product = Product::find($request->getAttr('id'));
-        $product->attributes = $request->getAttrs();
-        $product->update();
+        if($request->getAttr('name')){
+            $product->name = $request->getAttr('name');
+        }
+        if($request->getAttr('type')){
+            $product->type = $request->getAttr('type');
+        }
+        
+        $product->update($request->getAttr('id'), $product->toArray());
 
-        return new Response('Regular response');
+        return new Response($product->name . ', ' . $product->type);
     }
 
     static public function indexJsonAction($request): JsonResponse
@@ -31,9 +37,12 @@ class IndexController
     static public function indexJsonActionPost($request): JsonResponse
     {
         $product = new Product();
-        $product->attributes = $request->getAttrs();
+        $data = $request->getAttrs();
+        foreach($data as $key => $value){
+            $product->$key = $value;
+        }
+
         $queryParams = $request->getParams();
-        
         if($queryParams){
             $arrayOfParams = [];
             for($i = 0; $i < count($queryParams[key($queryParams)]); $i++){
@@ -43,9 +52,10 @@ class IndexController
                 }
                 $arrayOfParams[] = $Params;
             }
-            $product->attributes = $arrayOfParams;
+            foreach($queryParams as $key => $value){
+                $product->$key = $value;
+            };
         }
-
         $product->save();
         return new JsonResponse($product->toarray());
     }
@@ -58,6 +68,6 @@ class IndexController
         ]);
         $twig = new \Twig\Environment($loader);
         
-        return new HtmlResponse($twig->render('index', ['name' => $product->attributes['name']]));
+        return new HtmlResponse($twig->render('index', ['name' => $product->name]));
     }
 }

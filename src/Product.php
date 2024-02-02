@@ -7,5 +7,6 @@ class Product extends Model
 {
     protected int|string $primaryKey = 'id';
     protected string $tableName = 'products';
-    public array $attributes = [];
+    public string|array $name = '';
+    public string|array $type = '';
 }

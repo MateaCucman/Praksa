@@ -7,28 +7,26 @@ abstract class Model
 {
     protected string $tableName;
     protected int|string $primaryKey;
-    public array $attributes;
 
     public function save()
     {
-        $this->primaryKey = Connection::getInstance()->insert($this->tableName, $this->attributes);
-        $this->attributes = self::find($this->primaryKey)->toArray();
+        Connection::getInstance()->insert($this->tableName, $this->toArray());
+        $this->{$this->primaryKey} = Connection::getInstance()->connection->lastInsertId();
     }
 
-    public function update()
+    public function update($id)
     {
-        $idValue = end($this->attributes);
-        $idKey = key($this->attributes);
-        array_pop($this->attributes);
-        Connection::getInstance()->update($this->tableName, $this->attributes, [$idKey => $idValue]);
+        Connection::getInstance()->update($this->tableName, $this->toArray(), [$this->primaryKey => $id]);
     }
 
     static public function find($primaryKey): ?Model
     {
         $instance = new static();
         $query = "SELECT * FROM $instance->tableName WHERE $instance->primaryKey = ?";
-        $instance->attributes = Connection::getInstance()->fetchAssoc($query, [$primaryKey]);
-
+        $data = Connection::getInstance()->fetchAssoc($query, [$primaryKey]);
+        foreach($data as $key => $value){
+            $instance->$key = $value;
+        }
         return $instance;
     }
 
@@ -44,6 +42,13 @@ abstract class Model
 
     public function toArray(): array
     {
-        return $this->attributes;
+        $data = [];
+        foreach($this as $key => $value){
+            if($key !== 'primaryKey' && $key !== 'tableName'){
+                $data[$key] = $value;
+            }
+        }
+        
+        return $data;
     }
 }
