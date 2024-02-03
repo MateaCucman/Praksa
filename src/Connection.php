@@ -37,7 +37,6 @@ class Connection
     {
         $conn = $this->connection->prepare($query);
         $conn->execute($params);
-        
         return $conn->fetch(\PDO::FETCH_ASSOC);
     }
 
@@ -63,7 +62,7 @@ class Connection
                     array_push($valuesValues, $value);
                 }
             }
-            print_r($valuesValues);
+
             $placeholders = implode('), (', array_fill(0, count($values['name']), $placeholder));
             
         } else {
@@ -100,5 +99,12 @@ class Connection
         $statement = $conn->prepare("UPDATE $tableName SET $setValues WHERE $whereValues;");
 
         $statement->execute();
+    }
+
+    public function delete($query, $id)
+    {
+        $conn = $this->connection;
+        $statement = $conn->prepare($query);
+        $statement->execute($id);
     }
 }

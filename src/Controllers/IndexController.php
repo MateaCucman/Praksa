@@ -24,13 +24,16 @@ class IndexController
         return new Response($product->name . ', ' . $product->type);
     }
 
+    static public function indexActionPost($request): Response
+    {
+        $product = Product::find($request->getAttr('id'));
+        $product->delete($request->getAttr('id'));
+        return new Response($product->name . ' deleted');
+    }
+
     static public function indexJsonAction($request): JsonResponse
     {
-        $params = array_filter($request->getAttrs(), function($key){
-            return $key == 'id' || $key == 'type';
-        }, ARRAY_FILTER_USE_KEY);
-        
-        $product = Product::select($params);
+        $product = Product::select([$request->getAttr('id')]);
         return new JsonResponse($product);
     }
 
@@ -69,5 +72,17 @@ class IndexController
         $twig = new \Twig\Environment($loader);
         
         return new HtmlResponse($twig->render('index', ['name' => $product->name]));
+    }
+    static public function indexHtmlActionPost($request): HtmlResponse
+    {
+        $product = Product::find($request->getAttr('id'));
+        $product->softDelete($request->getAttr('id'));
+
+        $loader = new \Twig\Loader\arrayLoader([
+            'index' => '<h2>Product: {{ name }} deleted at {{ deleted_at }}!</h2>',
+        ]);
+        $twig = new \Twig\Environment($loader);
+        
+        return new HtmlResponse($twig->render('index', ['name' => $product->name, 'deleted_at' => $product->deleted_at]));
     }
 }

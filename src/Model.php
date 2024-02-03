@@ -5,18 +5,28 @@ use Matea\Praksa\Connection;
 
 abstract class Model
 {
+    use Traits\Timestamp, Traits\softDelete;
+
     protected string $tableName;
     protected int|string $primaryKey;
 
-    public function save()
+    public function save(): void
     {
+        $this->enableTimestamp();
+        $this->created_at = $this->getCreatedAt();
+
         Connection::getInstance()->insert($this->tableName, $this->toArray());
         $this->{$this->primaryKey} = Connection::getInstance()->connection->lastInsertId();
     }
 
-    public function update($id)
+    public function update($primaryKey): void
     {
-        Connection::getInstance()->update($this->tableName, $this->toArray(), [$this->primaryKey => $id]);
+        if($this->created_at){
+            $this->enableTimestamp();
+        }
+        $this->updated_at = $this->getUpdatedAt();
+
+        Connection::getInstance()->update($this->tableName, $this->toArray(), [$this->primaryKey => $primaryKey]);
     }
 
     static public function find($primaryKey): ?Model
@@ -32,19 +42,32 @@ abstract class Model
 
     static public function select($params): array
     {
-        $query = 'SELECT id, name FROM products
-                    WHERE type = :type AND id > :id
-                    LIMIT 20';
-        
+        $instance = new static();
+        $query = "SELECT * FROM $instance->tableName
+                    WHERE $instance->primaryKey > ?
+                    LIMIT 20";
+
         $pdo = Connection::getInstance()->fetchAssocAll($query, $params);
         return $pdo;
+    }
+
+    public function delete($primaryKey): void
+    {
+        $query = "DELETE FROM $this->tableName WHERE $this->tableName.$this->primaryKey = ?";
+        $pdo = Connection::getInstance()->delete($query, [$primaryKey]);
+    }
+
+    public function softDelete($primaryKey): void
+    {
+        $this->deleted_at = $this->getSoftDelete($primaryKey);
+        $this->update($primaryKey);
     }
 
     public function toArray(): array
     {
         $data = [];
         foreach($this as $key => $value){
-            if($key !== 'primaryKey' && $key !== 'tableName'){
+            if($key !== 'primaryKey' && $key !== 'tableName' && $key !== 'timestampEnabled' && $key !== 'softDeleted'){
                 $data[$key] = $value;
             }
         }

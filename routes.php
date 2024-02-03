@@ -41,3 +41,7 @@ Router::post('/update/:name/:type/:id', [IndexController::class, 'indexAction'])
 Router::post('/insertOne/:name/:type', [IndexController::class, 'indexJsonActionPost']);
 
 Router::post('/insertMany/products', [IndexController::class, 'indexJsonActionPost']);
+
+Router::post('/delete/:id', [IndexController::class, 'indexActionPost']);
+
+Router::get('/softDelete/:id', [IndexController::class, 'indexHtmlActionPost']);
