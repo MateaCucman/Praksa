@@ -73,6 +73,7 @@ class IndexController
         
         return new HtmlResponse($twig->render('index', ['name' => $product->name]));
     }
+
     static public function indexHtmlActionPost($request): HtmlResponse
     {
         $product = Product::find($request->getAttr('id'));

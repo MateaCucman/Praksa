@@ -51,20 +51,19 @@ class Connection
     public function insert (string $tableName, array $values): void
     {
         $conn = $this->connection;
-        if(is_array($values[key($values)])) {
+        $key = key($values);
+
+        if(is_array($values[$key])) {
             $valuesKeys = array_keys($values);
             $placeholder = implode(',', array_fill(0, count($valuesKeys), '?'));
-            $placeholders = [];
-            $valuesValues = [];
-            
-            foreach($values as $values_){
-                foreach($values_ as $value){
-                    array_push($valuesValues, $value);
+
+            for($i = 0; $i < count($values[$key]); $i++){
+                foreach($values as $value){
+                    $valuesValues[] = $value[$i];
                 }
             }
 
-            $placeholders = implode('), (', array_fill(0, count($values['name']), $placeholder));
-            
+            $placeholders = implode('), (', array_fill(0, count($values[$key]), $placeholder));
         } else {
             $valuesKeys = array_keys($values);
             $valuesValues = array_values($values);
@@ -74,7 +73,7 @@ class Connection
         $columnNames = implode(',', $valuesKeys);
 
         $statement = $conn->prepare("INSERT INTO $tableName ($columnNames) VALUES ($placeholders);");
-
+        
         $statement->execute($valuesValues);
     }
 

@@ -13,8 +13,17 @@ abstract class Model
     public function save(): void
     {
         $this->enableTimestamp();
-        $this->created_at = $this->getCreatedAt();
+        $key = key($this->toArray());
 
+        if(is_array($this->toArray()[$key])){
+            foreach($this->toArray()[$key] as $eachData){
+                $this->getCreatedAt();
+                $created_at[] = $this->created_at;
+            }
+            $this->created_at = $created_at;
+        } else {
+            $this->getCreatedAt();
+        }
         Connection::getInstance()->insert($this->tableName, $this->toArray());
         $this->{$this->primaryKey} = Connection::getInstance()->connection->lastInsertId();
     }
@@ -24,7 +33,7 @@ abstract class Model
         if($this->created_at){
             $this->enableTimestamp();
         }
-        $this->updated_at = $this->getUpdatedAt();
+        $this->getUpdatedAt();
 
         Connection::getInstance()->update($this->tableName, $this->toArray(), [$this->primaryKey => $primaryKey]);
     }
@@ -59,7 +68,7 @@ abstract class Model
 
     public function softDelete($primaryKey): void
     {
-        $this->deleted_at = $this->getSoftDelete($primaryKey);
+        $this->getSoftDelete($primaryKey);
         $this->update($primaryKey);
     }
 
@@ -67,7 +76,7 @@ abstract class Model
     {
         $data = [];
         foreach($this as $key => $value){
-            if($key !== 'primaryKey' && $key !== 'tableName' && $key !== 'timestampEnabled' && $key !== 'softDeleted'){
+            if($key !== 'primaryKey' && $key !== 'tableName' && $key !== 'timestampEnabled'){
                 $data[$key] = $value;
             }
         }

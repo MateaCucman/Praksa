@@ -5,9 +5,8 @@ trait SoftDelete
 {
     public ?string $deleted_at;
 
-    public function getSoftDelete(): string
+    public function getSoftDelete(): void
     {
         $this->deleted_at = date('d.m.Y H:i:s');
-        return $this->deleted_at;
     }
 }
