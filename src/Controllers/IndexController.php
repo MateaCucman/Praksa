@@ -4,14 +4,16 @@ namespace Matea\Praksa\Controllers;
 use Matea\Praksa\Responses\Response;
 use Matea\Praksa\Responses\JsonResponse;
 use Matea\Praksa\Responses\HtmlResponse;
+use Matea\Praksa\Request;
 use Matea\Praksa\Product;
 use Twig;
 
 class IndexController
 {
-    static public function indexAction($request): Response
+    static public function indexAction(Request $request): Response
     {
-        $product = Product::find($request->getAttr('id'));
+        $product = new Product();
+        $product = $product->find($request->getAttr('id'));
         if($request->getAttr('name')){
             $product->name = $request->getAttr('name');
         }
@@ -24,20 +26,22 @@ class IndexController
         return new Response($product->name . ', ' . $product->type);
     }
 
-    static public function indexActionPost($request): Response
+    static public function indexActionPost(Request $request): Response
     {
-        $product = Product::find($request->getAttr('id'));
+        $product = new Product();
+        $product = $product->find($request->getAttr('id'));
         $product->delete($request->getAttr('id'));
         return new Response($product->name . ' deleted');
     }
 
-    static public function indexJsonAction($request): JsonResponse
+    static public function indexJsonAction(Request $request): JsonResponse
     {
-        $product = Product::select([$request->getAttr('id')]);
+        $product = new Product();
+        $product = $product->select([$request->getAttr('id')]);
         return new JsonResponse($product);
     }
 
-    static public function indexJsonActionPost($request): JsonResponse
+    static public function indexJsonActionPost(Request $request): JsonResponse
     {
         $product = new Product();
         $data = $request->getAttrs();
@@ -63,27 +67,15 @@ class IndexController
         return new JsonResponse($product->toarray());
     }
 
-    static public function indexHtmlAction($request): HtmlResponse
+    static public function indexHtmlAction(Request $request): HtmlResponse
     {
-        $product = Product::find($request->getAttr('id'));
+        $product = new Product();
+        $product = $product->find($request->getAttr('id'));
         $loader = new \Twig\Loader\arrayLoader([
             'index' => '<h2>Product: {{ name }}!</h2>',
         ]);
         $twig = new \Twig\Environment($loader);
         
         return new HtmlResponse($twig->render('index', ['name' => $product->name]));
-    }
-
-    static public function indexHtmlActionPost($request): HtmlResponse
-    {
-        $product = Product::find($request->getAttr('id'));
-        $product->softDelete($request->getAttr('id'));
-
-        $loader = new \Twig\Loader\arrayLoader([
-            'index' => '<h2>Product: {{ name }} deleted at {{ deleted_at }}!</h2>',
-        ]);
-        $twig = new \Twig\Environment($loader);
-        
-        return new HtmlResponse($twig->render('index', ['name' => $product->name, 'deleted_at' => $product->deleted_at]));
     }
 }

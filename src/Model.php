@@ -5,24 +5,26 @@ use Matea\Praksa\Connection;
 
 abstract class Model
 {
-    use Traits\Timestamp, Traits\softDelete;
+    use Traits\HasTimestamps, Traits\SoftDelete;
 
     protected string $tableName;
     protected int|string $primaryKey;
 
     public function save(): void
     {
-        $this->enableTimestamp();
+        $this->enableTimestamps();
         $key = key($this->toArray());
 
-        if(is_array($this->toArray()[$key])){
-            foreach($this->toArray()[$key] as $eachData){
-                $this->getCreatedAt();
-                $created_at[] = $this->created_at;
+        if($this->timestampsEnabled){
+            if(is_array($this->toArray()[$key])){
+                foreach($this->toArray()[$key] as $eachData){
+                    $this->setCreatedAt();
+                    $created_at[] = $this->created_at;
+                }
+                $this->created_at = $created_at;
+            } else {
+                $this->setCreatedAt();
             }
-            $this->created_at = $created_at;
-        } else {
-            $this->getCreatedAt();
         }
         Connection::getInstance()->insert($this->tableName, $this->toArray());
         $this->{$this->primaryKey} = Connection::getInstance()->connection->lastInsertId();
@@ -30,15 +32,14 @@ abstract class Model
 
     public function update($primaryKey): void
     {
-        if($this->created_at){
-            $this->enableTimestamp();
+        if($this->created_at != null){
+            $this->enableTimestamps();
         }
-        $this->getUpdatedAt();
-
+        $this->setUpdatedAt();
         Connection::getInstance()->update($this->tableName, $this->toArray(), [$this->primaryKey => $primaryKey]);
     }
 
-    static public function find($primaryKey): ?Model
+    public function find($primaryKey): ?Model
     {
         $instance = new static();
         $query = "SELECT * FROM $instance->tableName WHERE $instance->primaryKey = ?";
@@ -49,7 +50,7 @@ abstract class Model
         return $instance;
     }
 
-    static public function select($params): array
+    public function select($params): array
     {
         $instance = new static();
         $query = "SELECT * FROM $instance->tableName
@@ -60,27 +61,25 @@ abstract class Model
         return $pdo;
     }
 
-    public function delete($primaryKey): void
+    public function delete(string $primaryKey): void
     {
-        $query = "DELETE FROM $this->tableName WHERE $this->tableName.$this->primaryKey = ?";
-        $pdo = Connection::getInstance()->delete($query, [$primaryKey]);
-    }
-
-    public function softDelete($primaryKey): void
-    {
-        $this->getSoftDelete($primaryKey);
-        $this->update($primaryKey);
+        if($this->created_at != null){
+            $this->softDelete();
+            $this->update($primaryKey);
+        } else {
+            Connection::getInstance()->delete($this->tableName, [$this->primaryKey => $primaryKey]);
+        }
     }
 
     public function toArray(): array
     {
         $data = [];
         foreach($this as $key => $value){
-            if($key !== 'primaryKey' && $key !== 'tableName' && $key !== 'timestampEnabled'){
+            if($key !== 'primaryKey' && $key !== 'tableName' && $key !== 'timestampsEnabled'){
                 $data[$key] = $value;
             }
         }
-        
+
         return $data;
     }
 }

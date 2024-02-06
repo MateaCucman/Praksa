@@ -43,5 +43,3 @@ Router::post('/insertOne/:name/:type', [IndexController::class, 'indexJsonAction
 Router::post('/insertMany/products', [IndexController::class, 'indexJsonActionPost']);
 
 Router::post('/delete/:id', [IndexController::class, 'indexActionPost']);
-
-Router::post('/softDelete/:id', [IndexController::class, 'indexHtmlActionPost']);
